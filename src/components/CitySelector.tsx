@@ -1,114 +1,67 @@
-import { useEffect, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, MapPin } from "lucide-react";
 
-interface CitySelectorProps {
+interface Props {
   city: string;
-  setCity: (val: string) => void;
+  setCity: (city: string) => void;
   onSearch: () => void;
+  onGps: () => void; // YENİ PROP
   loading: boolean;
 }
-
-type CityItem = {
-  id: number;
-  name: string;
-  country: string;
-};
 
 export default function CitySelector({
   city,
   setCity,
   onSearch,
+  onGps,
   loading,
-}: CitySelectorProps) {
-  const [cities, setCities] = useState<CityItem[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-
-  // Şehir listesini yükle
-  useEffect(() => {
-    fetch("/cities.json")
-      .then((res) => res.json())
-      .then((data) => setCities(data));
-  }, []);
-
-  // Filtre
-  const filtered = useMemo(() => {
-    if (!showSuggestions) return [];
-
-    if (!city.trim()) {
-      return cities.slice(0, 200);
-    }
-
-    const lower = city.toLowerCase();
-
-    return cities
-      .filter((c) => c.name.toLowerCase().includes(lower))
-      .slice(0, 20);
-  }, [city, cities, showSuggestions]);
-
+}: Props) {
   return (
-    <div className="relative w-full">
-      <div className="
-        flex w-full items-center 
-        bg-[var(--panel)] border border-[var(--border)]
-        rounded-2xl px-4 py-3 mb-2 shadow-sm
-        focus-within:ring-2 focus-within:ring-[var(--border)]
-      ">
+    <div className="flex w-full gap-2 mb-6">
+      <div className="relative flex-1">
         <input
           type="text"
-          placeholder="Şehir ara…"
-          className="flex-1 bg-transparent outline-none"
+          placeholder="Şehir ara..."
+          className="
+            w-full pl-4 pr-12 py-3 rounded-xl
+            bg-[var(--panel)] 
+            border border-[var(--border)]
+            text-[var(--foreground)]
+            focus:outline-none focus:ring-2 focus:ring-[var(--foreground)]
+            transition-all
+          "
           value={city}
-          onFocus={() => setShowSuggestions(true)}
           onChange={(e) => setCity(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setShowSuggestions(false);
-              onSearch();   // Enter ile ara
-            }
-          }}
+          onKeyDown={(e) => e.key === "Enter" && onSearch()}
         />
-
         <button
-          onClick={() => {
-            setShowSuggestions(false);
-            onSearch();     // buton ile ara
-          }}
+          onClick={onSearch}
           disabled={loading}
-          className="px-3 py-2 rounded-xl border border-[var(--border)]"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
         >
-          <Search size={18} />
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-t-transparent border-[var(--foreground)] rounded-full animate-spin" />
+          ) : (
+            <Search size={20} />
+          )}
         </button>
       </div>
 
-      {/* Liste */}
-      {showSuggestions && filtered.length > 0 && (
-        <div className="
-          absolute left-0 right-0 z-20
-          bg-[var(--panel)] border border-[var(--border)]
-          rounded-xl shadow-md max-h-60 overflow-auto
-        ">
-          {filtered.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => {
-                setCity(item.name);     // şehir güncelle
-                setShowSuggestions(false);
-                onSearch();             // tıklanınca HEMEN arama
-              }}
-              className="
-                px-4 py-2 cursor-pointer
-                hover:bg-[var(--muted-bg)]
-                text-sm text-[var(--foreground)]
-              "
-            >
-              {item.name}
-              <span className="text-xs text-[var(--muted)]">
-                {" "}({item.country})
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* YENİ EKLENEN GPS BUTONU */}
+      <button
+        onClick={onGps}
+        disabled={loading}
+        className="
+          px-3 rounded-xl
+          bg-[var(--panel)]
+          border border-[var(--border)]
+          text-[var(--foreground)]
+          hover:bg-[var(--foreground)] hover:text-[var(--background)]
+          transition-all active:scale-95 flex items-center justify-center
+        "
+        title="Konumumu Bul"
+      >
+        <MapPin size={22} />
+      </button>
     </div>
   );
 }

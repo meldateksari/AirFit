@@ -37,3 +37,23 @@ export const getWeatherData = async (
     forecast: forecast.data.list,
   };
 };
+export const getWeatherByCoords = async (
+  lat: number,
+  lon: number
+): Promise<WeatherResponse> => {
+  const current = await axios.get<CurrentWeatherData>(`${BASE_URL}/weather`, {
+    params: { lat, lon, appid: API_KEY, units: "metric", lang: "tr" },
+  });
+
+  const forecast = await axios.get<{ list: ForecastItem[] }>(
+    `${BASE_URL}/forecast`,
+    {
+      params: { lat, lon, appid: API_KEY, units: "metric", lang: "tr" },
+    }
+  );
+
+  return {
+    current: current.data,
+    forecast: forecast.data.list,
+  };
+};
