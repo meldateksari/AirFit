@@ -73,10 +73,11 @@ function ChatBubble({
           : null,
       });
 
-      const botMsg: ChatMessage = {
-        role: "assistant",
-        content: res.data.text || "Cevap alınamadı.", // API dönüşüne göre .text veya .reply olabilir, burayı kontrol et
-      };
+   const botMsg: ChatMessage = {
+  role: "assistant",
+  content: res.data.reply ?? "Cevap alınamadı.",
+};
+
 
       setMessages((prev) => [...prev, botMsg]);
     } catch (error) {
