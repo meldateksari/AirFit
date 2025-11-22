@@ -1,8 +1,6 @@
+import ReactMarkdown from "react-markdown";
 import { Sparkles } from "lucide-react";
-
-interface AdviceCardProps {
-  advice: string;
-}
+interface AdviceCardProps { advice: string; }
 
 export default function AdviceCard({ advice }: AdviceCardProps) {
   return (
@@ -22,9 +20,9 @@ export default function AdviceCard({ advice }: AdviceCardProps) {
         </span>
       </div>
 
-      <p className="text-sm leading-relaxed whitespace-pre-line text-[var(--foreground)]/80">
-        {advice}
-      </p>
+      <div className="text-sm leading-relaxed text-[var(--foreground)]/80">
+        <ReactMarkdown>{advice}</ReactMarkdown>
+      </div>
     </div>
   );
 }
